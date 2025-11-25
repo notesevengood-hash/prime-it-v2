@@ -1,12 +1,569 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prime IT Solutions</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>Prime IT Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <style>
+    :root { color-scheme: dark; }
+    .page { display: none; opacity: 0; transform: translateY(8px); transition: opacity 180ms ease, transform 180ms ease; }
+    .page.active { display: block; opacity: 1; transform: translateY(0); }
+    .glow { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+    .glow::before, .glow::after {
+      content:""; position:absolute; border-radius:9999px; filter:blur(80px); opacity:.5;
+    }
+    .glow::before { width:520px; height:520px; top:-160px; right:-160px; background:rgba(232, 121, 249, .35); }
+    .glow::after { width:620px; height:620px; bottom:-220px; left:-220px; background:rgba(34, 211, 238, .35); }
+    .grid-bg { background:radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0); background-size:28px 28px; opacity:.4; }
+    /* simple pulse */
+    @keyframes pulseDot { 0%,100%{opacity:.6;} 50%{opacity:1;} }
+    .dot { animation:pulseDot 1.4s infinite; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#04050a] text-white">
+  <!-- Icon symbols -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+    <symbol id="network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="8" x="6" y="3" rx="1"/><path d="M12 11v4"/><rect width="20" height="8" x="2" y="13" rx="1"/><path d="M6 17v4"/><path d="M18 17v4"/></symbol>
+    <symbol id="shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.1 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 15h3"/><path d="M1 9h3"/><path d="M1 15h3"/></symbol>
+    <symbol id="zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+    <symbol id="cctv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10l5 5-5 5H7l-5-5z"/><path d="M12 12v2"/><path d="M2 12h2"/><path d="M20 12h2"/></symbol>
+    <symbol id="code2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="M8 6 2 12l6 6"/></symbol>
+    <symbol id="building2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12"/><path d="M9 21V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v16"/><path d="M10 9h4"/><path d="M10 13h4"/><path d="M10 17h4"/></symbol>
+    <symbol id="users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="briefcase" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M2 13h20"/></symbol>
+    <symbol id="mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 8 8 8-8"/><rect x="4" y="4" width="16" height="16" rx="2"/></symbol>
+    <symbol id="map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></symbol>
+    <symbol id="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  </svg>
+
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#04050a]/70 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
+      <button data-nav="home" class="flex items-center gap-3">
+        <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 to-fuchsia-500 font-bold">P</div>
+        <div class="text-left leading-tight">
+          <div class="text-sm font-semibold tracking-wide">Prime IT Solutions</div>
+          <div class="text-[11px] text-white/50">Where Innovation Meets IT Excellence</div>
+        </div>
+      </button>
+      <nav class="hidden items-center gap-1 md:flex" id="desktop-nav"></nav>
+      <button class="md:hidden grid h-10 w-10 place-items-center rounded-xl bg-white/5 hover:bg-white/10" id="mobile-toggle" aria-label="Toggle menu">
+        <svg class="w-5 h-5" id="mobile-icon"><use href="#menu"/></svg>
+      </button>
+    </div>
+    <div class="md:hidden border-t border-white/10 hidden" id="mobile-nav"></div>
+  </header>
+
+  <main class="px-4 md:px-8">
+    <div class="relative min-h-[calc(100vh-120px)]">
+      <div class="glow"></div>
+      <div class="absolute inset-0 grid-bg"></div>
+      <div class="relative">
+        <!-- Home -->
+        <section id="page-home" class="page active">
+          <div class="mx-auto max-w-6xl">
+            <section class="relative pt-10 md:pt-16">
+              <div class="grid items-center gap-8 md:grid-cols-2">
+                <div>
+                  <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+                    <span class="h-2 w-2 rounded-full bg-cyan-400 dot"></span> FUTURE-READY IT SERVICES
+                  </div>
+                  <h1 class="mt-4 text-4xl md:text-5xl font-semibold leading-tight">Where Innovation Meets <span class="text-cyan-300">IT Excellence</span></h1>
+                  <p class="mt-4 text-white/70 text-lg">Delivering cutting-edge IT solutions and consulting services to transform your business.</p>
+                  <div class="mt-6 flex flex-wrap gap-3">
+                    <button data-nav="services" class="rounded-2xl bg-gradient-to-r from-cyan-400 to-fuchsia-500 px-5 py-3 text-sm font-semibold shadow-lg shadow-fuchsia-500/20">Explore Our Services</button>
+                    <button data-nav="contact" class="rounded-2xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold hover:bg-white/10">Contact Us</button>
+                  </div>
+                  <div class="mt-8 grid grid-cols-2 gap-3 text-sm text-white/70">
+                    <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div class="text-lg font-semibold text-white">150+</div><div class="text-xs text-white/60">Projects Delivered</div></div>
+                    <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div class="text-lg font-semibold text-white">60+</div><div class="text-xs text-white/60">Enterprise Clients</div></div>
+                    <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div class="text-lg font-semibold text-white">18+</div><div class="text-xs text-white/60">Solution Partners</div></div>
+                    <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div class="text-lg font-semibold text-white">&lt; 2h</div><div class="text-xs text-white/60">Avg. Response</div></div>
+                  </div>
+                </div>
+                <div class="relative">
+                  <div class="aspect-square rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 p-4">
+                    <div class="h-full w-full rounded-2xl bg-[conic-gradient(from_180deg_at_50%_50%,rgba(34,211,238,0.25),rgba(217,70,239,0.25),rgba(34,211,238,0.25))] p-[1px]">
+                      <div class="h-full w-full rounded-2xl bg-[#050714] grid place-items-center">
+                        <div class="relative h-72 w-72 md:h-80 md:w-80">
+                          <div class="absolute inset-0 rounded-full border border-white/10 animate-[spin_18s_linear_infinite]"></div>
+                          <div class="absolute inset-8 rounded-full border border-cyan-300/30 animate-[spin_12s_linear_reverse_infinite]"></div>
+                          <div class="absolute inset-16 rounded-full border border-fuchsia-300/30 animate-[spin_9s_linear_infinite]"></div>
+                          <div class="absolute inset-0 grid place-items-center">
+                            <div class="rounded-3xl bg-white/10 px-6 py-5 text-center">
+                              <div class="text-sm text-white/70">Prime Stack</div>
+                              <div class="mt-2 grid grid-cols-2 gap-2 text-xs">
+                                <div class="rounded-xl bg-[#050714] px-3 py-2">Infrastructure</div>
+                                <div class="rounded-xl bg-[#050714] px-3 py-2">Cybersecurity</div>
+                                <div class="rounded-xl bg-[#050714] px-3 py-2">IoT</div>
+                                <div class="rounded-xl bg-[#050714] px-3 py-2">Software</div>
+                                <div class="rounded-xl bg-[#050714] px-3 py-2">Telephony</div>
+                                <div class="rounded-xl bg-[#050714] px-3 py-2">Power</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="absolute h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.9)]" style="top:6%;left:50%;transform:translate(-50%,-50%);"></div>
+                          <div class="absolute h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.9)]" style="top:50%;left:94%;transform:translate(-50%,-50%);"></div>
+                          <div class="absolute h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.9)]" style="top:92%;left:50%;transform:translate(-50%,-50%);"></div>
+                          <div class="absolute h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.9)]" style="top:50%;left:6%;transform:translate(-50%,-50%);"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="absolute -bottom-4 -left-4 rounded-2xl bg-white/5 border border-white/10 px-4 py-3 text-xs text-white/70">
+                    AI-assisted delivery • Secure-by-design • Cloud-native
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="mt-16 md:mt-20">
+              <div class="mb-8">
+                <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">About</div>
+                <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Prime IT Solutions</h2>
+              </div>
+              <div class="grid gap-6 md:grid-cols-3">
+                <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                  <h3 class="text-lg font-semibold">Who we are</h3>
+                  <p class="mt-2 text-white/70">Prime IT Solutions focuses on IT solution designing & consulting. Founded upon a vision to change the way we interact with information technology, we deliver workflow and knowledge support to help clients handle dynamic business and technology challenges.</p>
+                </div>
+                <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                  <h3 class="text-lg font-semibold">What we aim for</h3>
+                  <p class="mt-2 text-white/70">We combine deep industry expertise with enabling technologies to improve bottom-line performance. We bring experience, best practices, and customized tools suited to each client’s unique requirements.</p>
+                </div>
+                <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                  <h3 class="text-lg font-semibold">Who we serve</h3>
+                  <p class="mt-2 text-white/70">We provide IT solutions for both private and public sectors, across organizations of all sizes—simplifying operations by integrating and automating business processes.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="mt-16 md:mt-20">
+              <div class="mb-8">
+                <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Business Units</div>
+                <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Solutions across your transformation journey</h2>
+                <p class="mt-2 text-white/70 max-w-3xl">Comprehensive IT solutions spanning various needs at every stage of the transformation process.</p>
+              </div>
+              <div class="grid gap-4 md:grid-cols-2" id="services-preview"></div>
+            </section>
+
+            <section class="mt-16 md:mt-20">
+              <div class="mb-8">
+                <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Testimonials</div>
+                <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">What Our Clients Say</h2>
+              </div>
+              <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 p-8 md:p-10">
+                <p class="text-lg text-white/80">“Prime IT Solutions showed professionalism and outstanding developer efficiency. Challenges during the development cycle were solved quickly, communication stayed smooth, and delivery was fast. We fully met our expectations and look forward to working together again.”</p>
+                <div class="mt-5 flex items-center gap-3 text-sm">
+                  <div class="grid h-9 w-9 place-items-center rounded-full bg-white/10"><svg class="w-4 h-4"><use href="#users"/></svg></div>
+                  <div>
+                    <div class="font-semibold">Ruwan Weerasuriya</div>
+                    <div class="text-white/60">Air Resources Management Center, Sri Lanka</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="mt-16 mb-16">
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                  <h3 class="text-2xl font-semibold">Ready to Transform Your Business?</h3>
+                  <p class="mt-2 text-white/70">Let’s discuss how our IT solutions can help you achieve your business goals.</p>
+                </div>
+                <button data-nav="contact" class="rounded-2xl bg-gradient-to-r from-cyan-400 to-fuchsia-500 px-6 py-3 text-sm font-semibold shadow-lg shadow-cyan-500/20">Get Started Today</button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- Services -->
+        <section id="page-services" class="page">
+          <div class="mx-auto max-w-6xl py-10 md:py-14">
+            <div class="mb-8">
+              <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Services</div>
+              <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Comprehensive IT solutions tailored to your business needs</h2>
+              <p class="mt-2 text-white/70 max-w-3xl">We deliver excellence across all technology domains.</p>
+            </div>
+            <div class="grid gap-5 md:grid-cols-2" id="services-full"></div>
+
+            <div class="mt-10 rounded-3xl border border-white/10 bg-white/5 p-7 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+              <div>
+                <h4 class="text-xl font-semibold">Need a Custom Solution?</h4>
+                <p class="mt-1 text-white/70">Our team is ready to discuss your specific requirements and design a solution that fits your needs perfectly.</p>
+              </div>
+              <button data-nav="contact" class="rounded-2xl border border-white/15 bg-white/10 px-6 py-3 text-sm font-semibold hover:bg-white/15">Contact Our Experts</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Companies -->
+        <section id="page-companies" class="page">
+          <div class="mx-auto max-w-6xl py-10 md:py-14">
+            <div class="mb-8">
+              <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Group</div>
+              <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Our Companies</h2>
+              <p class="mt-2 text-white/70 max-w-3xl">A diverse portfolio of enterprises delivering excellence across multiple industries and sectors.</p>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2" id="companies-grid"></div>
+            <div class="mt-10 rounded-3xl border border-white/10 bg-white/5 p-7 md:p-8">
+              <h4 class="text-xl font-semibold">About Our Group</h4>
+              <p class="mt-2 text-white/70">Our group represents a commitment to excellence across diverse sectors. From cutting-edge IT solutions to traditional industries, we bring innovation, expertise, and reliability to every venture. Together, we create synergies that enable integrated services that drive business success.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Clients -->
+        <section id="page-clients" class="page">
+          <div class="mx-auto max-w-6xl py-10 md:py-14">
+            <div class="mb-8">
+              <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Clients</div>
+              <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Clients & Partners</h2>
+              <p class="mt-2 text-white/70 max-w-3xl">Building lasting relationships with industry leaders and innovative organizations worldwide.</p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2">
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <h3 class="text-lg font-semibold">Trusted by Leading Organizations</h3>
+                <p class="mt-2 text-white/70">We’re proud to serve a diverse portfolio of clients across industries, from startups to Fortune 500 companies. Our commitment to excellence has earned us long-term partnerships with organizations that value innovation and reliability.</p>
+                <div class="mt-4 grid grid-cols-3 gap-3 opacity-80">
+                  <div class="h-12 rounded-xl bg-white/10"></div><div class="h-12 rounded-xl bg-white/10"></div><div class="h-12 rounded-xl bg-white/10"></div>
+                  <div class="h-12 rounded-xl bg-white/10"></div><div class="h-12 rounded-xl bg-white/10"></div><div class="h-12 rounded-xl bg-white/10"></div>
+                </div>
+              </div>
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <h3 class="text-lg font-semibold">Industries We Serve</h3>
+                <div class="mt-3 flex flex-wrap gap-2" id="industries"></div>
+              </div>
+            </div>
+            <div class="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 p-7 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+              <div>
+                <h4 class="text-xl font-semibold">Become a Partner</h4>
+                <p class="mt-1 text-white/70">Interested in partnering with us? Let’s explore how we can create value together.</p>
+              </div>
+              <button data-nav="contact" class="rounded-2xl bg-white/10 px-6 py-3 text-sm font-semibold hover:bg-white/15">Contact Us</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Careers -->
+        <section id="page-careers" class="page">
+          <div class="mx-auto max-w-6xl py-10 md:py-14">
+            <div class="mb-8">
+              <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Careers</div>
+              <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Build the future with Prime</h2>
+              <p class="mt-2 text-white/70 max-w-3xl">Join a team that ships real solutions, learns fast, and loves hard problems.</p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-3">
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <svg class="w-6 h-6 text-cyan-300"><use href="#briefcase"/></svg>
+                <h3 class="mt-3 text-lg font-semibold">Work on meaningful projects</h3>
+                <p class="mt-2 text-white/70">From critical infrastructure and cybersecurity to IoT and custom software, you’ll help deliver technology that matters.</p>
+              </div>
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <svg class="w-6 h-6 text-fuchsia-300"><use href="#users"/></svg>
+                <h3 class="mt-3 text-lg font-semibold">Grow your craft</h3>
+                <p class="mt-2 text-white/70">Mentoring, certifications, and exposure to global solution partners keep you moving forward.</p>
+              </div>
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <svg class="w-6 h-6 text-cyan-300"><use href="#cpu"/></svg>
+                <h3 class="mt-3 text-lg font-semibold">Future-ready culture</h3>
+                <p class="mt-2 text-white/70">We value initiative, curiosity, and clear communication—so great ideas ship quickly.</p>
+              </div>
+            </div>
+            <div class="mt-10 rounded-3xl border border-white/10 bg-white/5 p-7 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+              <div>
+                <h4 class="text-xl font-semibold">Want to join us?</h4>
+                <p class="mt-1 text-white/70">Email your CV and portfolio to <span class="text-white">hello@prime.lk</span> with the role you’re applying for.</p>
+              </div>
+              <button data-nav="contact" class="rounded-2xl bg-gradient-to-r from-cyan-400 to-fuchsia-500 px-6 py-3 text-sm font-semibold">Talk to HR</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="page-contact" class="page">
+          <div class="mx-auto max-w-6xl py-10 md:py-14">
+            <div class="mb-8">
+              <div class="text-xs tracking-[0.35em] uppercase text-cyan-300/90">Contact</div>
+              <h2 class="mt-2 text-3xl md:text-4xl font-semibold text-white">Contact Us</h2>
+              <p class="mt-2 text-white/70 max-w-3xl">Get in touch with our team. We’re here to help you find the right IT solutions for your business.</p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2">
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <h3 class="text-lg font-semibold">Get In Touch</h3>
+                <div class="mt-4 grid gap-4 text-sm">
+                  <div class="flex items-start gap-3">
+                    <div class="grid h-9 w-9 place-items-center rounded-xl bg-white/10"><svg class="w-4 h-4"><use href="#mail"/></svg></div>
+                    <div><div class="text-white/60">Email</div><div class="mt-0.5 text-white/85">hello@prime.lk</div></div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="grid h-9 w-9 place-items-center rounded-xl bg-white/10"><svg class="w-4 h-4"><use href="#phone"/></svg></div>
+                    <div><div class="text-white/60">Phone</div><div class="mt-0.5 text-white/85">+94 (11) 5 672 666 / +94 (11) 5 752 117</div></div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="grid h-9 w-9 place-items-center rounded-xl bg-white/10"><svg class="w-4 h-4"><use href="#map-pin"/></svg></div>
+                    <div><div class="text-white/60">Address</div><div class="mt-0.5 text-white/85">No. 36, Nugegoda Road, Pepiliyana, Sri Lanka</div></div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="grid h-9 w-9 place-items-center rounded-xl bg-white/10"><svg class="w-4 h-4"><use href="#clock"/></svg></div>
+                    <div>
+                      <div class="text-white/60">Business Hours</div>
+                      <div class="mt-1 grid gap-1 text-white/85">
+                        <div>Monday – Friday: 9:00 AM – 6:00 PM</div>
+                        <div>Saturday: 10:00 AM – 4:00 PM</div>
+                        <div>Sunday: Closed</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-6 h-56 rounded-2xl bg-white/10 grid place-items-center text-white/60">Add Google Map embed here</div>
+              </div>
+
+              <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <h3 class="text-lg font-semibold">Send Us a Message</h3>
+                <form class="mt-4 grid gap-3" id="contact-form">
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Full Name *</span>
+                    <input required class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-cyan-400/50" />
+                  </label>
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Email Address *</span>
+                    <input type="email" required class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-cyan-400/50" />
+                  </label>
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Phone Number</span>
+                    <input class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-cyan-400/50" />
+                  </label>
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Company Name</span>
+                    <input class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-cyan-400/50" />
+                  </label>
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Subject *</span>
+                    <input required class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-cyan-400/50" />
+                  </label>
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Service</span>
+                    <select class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white outline-none focus:border-cyan-400/50">
+                      <option value="">Select a service...</option>
+                      <option>IT Infrastructure</option><option>Cybersecurity</option><option>IP Telephony</option><option>IoT Solutions</option><option>Electrical & Power</option><option>Physical Security</option><option>Web & Software</option>
+                    </select>
+                  </label>
+                  <label class="grid gap-1 text-sm">
+                    <span class="text-white/70">Message *</span>
+                    <textarea required rows="5" class="rounded-2xl border border-white/10 bg-[#050714] px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-cyan-400/50"></textarea>
+                  </label>
+                  <button class="mt-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-fuchsia-500 px-6 py-3 text-sm font-semibold">Send Message</button>
+                  <div id="form-status" class="text-sm text-emerald-300 hidden">Message prepared locally. Hook this form to your backend/email service to send.</div>
+                </form>
+              </div>
+            </div>
+            <div class="mt-10 text-white/70">
+              <h4 class="text-lg font-semibold text-white">Visit Our Office</h4>
+              <p class="mt-2">We’d love to meet you—drop by during business hours or schedule a call.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-white/10 bg-[#050614]">
+    <div class="mx-auto max-w-6xl px-4 py-10 md:px-8 grid gap-8 md:grid-cols-4">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3">
+          <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 to-fuchsia-500 font-bold">P</div>
+          <div>
+            <div class="font-semibold">Prime IT Solutions (PVT) LTD</div>
+            <div class="text-xs text-white/60">Leading IT solutions provider delivering innovative technology services to businesses worldwide.</div>
+          </div>
+        </div>
+        <p class="mt-3 text-sm text-white/70 max-w-xl" id="current-view"></p>
+      </div>
+      <div class="text-sm">
+        <div class="font-semibold">Quick Links</div>
+        <div class="mt-2 grid gap-1 text-white/70">
+          <button data-nav="home" class="text-left hover:text-white">Home</button>
+          <button data-nav="services" class="text-left hover:text-white">Services</button>
+          <button data-nav="clients" class="text-left hover:text-white">Clients & Partners</button>
+          <button data-nav="careers" class="text-left hover:text-white">Careers</button>
+        </div>
+      </div>
+      <div class="text-sm">
+        <div class="font-semibold">Contact Us</div>
+        <div class="mt-2 grid gap-2 text-white/70">
+          <div>hello@prime.lk</div>
+          <div>+94 (11) 5 672 666 / +94 (11) 5 752 117</div>
+          <div>No. 36, Nugegoda Road, Pepiliyana, Sri Lanka</div>
+        </div>
+      </div>
+    </div>
+    <div class="px-4 pb-8 text-center text-xs text-white/50">© <span id="year"></span> Prime IT Solutions Private Limited. All rights reserved.</div>
+  </footer>
+
+  <script>
+    const NAV_ITEMS = [
+      { key: "home", label: "Home" },
+      { key: "services", label: "Services" },
+      { key: "companies", label: "Our Companies" },
+      { key: "clients", label: "Clients & Partners" },
+      { key: "careers", label: "Careers" },
+      { key: "contact", label: "Contact" },
+    ];
+    const SERVICES = [
+      { title:"IT Infrastructure Solutions & Services", icon:"#network", blurb:"Comprehensive infrastructure design, implementation, and management.", body:"We provide end-to-end IT infrastructure solutions including network design, server deployment, cloud migration, and infrastructure management. Our team ensures your IT foundation is robust, scalable, and secure to support your business growth.", chips:["Network","Cloud","Servers","Managed IT"] },
+      { title:"Cybersecurity Solutions & Services", icon:"#shield-check", blurb:"Advanced security solutions to protect your digital assets.", body:"Protect your organization with our advanced cybersecurity solutions. We offer threat detection and prevention, security audits, vulnerability assessments, penetration testing, and incident response services to safeguard your critical data.", chips:["Threat Detection","Audits","Pen-Testing","IR"] },
+      { title:"IP Telephony & Contact Center Solutions", icon:"#phone", blurb:"Modern communication systems for seamless connectivity.", body:"Transform your business communications with our IP telephony and contact center solutions. We deliver unified communications platforms, VoIP systems, and omnichannel customer engagement solutions for enterprise-grade reliability.", chips:["VoIP","UC","Contact Center","Omnichannel"] },
+      { title:"IoT Solutions & Services", icon:"#cpu", blurb:"Smart connected devices and IoT platform integration.", body:"Harness the power of connected devices with our IoT solutions. We provide IoT platform development, sensor integration, device management, and data analytics to enable smart operations and predictive maintenance.", chips:["Sensors","Platforms","Analytics","Automation"] },
+      { title:"Electrical & Power Solutions", icon:"#zap", blurb:"Reliable power infrastructure and management systems.", body:"Ensure reliable power infrastructure with our electrical and power solutions. We offer UPS systems, backup generators, power monitoring, and energy management solutions to protect your critical systems.", chips:["UPS","Generators","Monitoring","Energy Mgmt"] },
+      { title:"Physical Security Solutions", icon:"#cctv", blurb:"Comprehensive physical security and surveillance systems.", body:"Secure your facilities with our comprehensive physical security solutions. We provide access control systems, video surveillance, intrusion detection, and integrated security management platforms.", chips:["Access Control","CCTV","Intrusion","Integrated"] },
+      { title:"Web Designing & Software Solutions", icon:"#code2", blurb:"Custom software development and web design services.", body:"Bring your digital vision to life with our web design and software development services. We create responsive websites, custom applications, mobile apps, and e-commerce platforms using modern technologies.", chips:["Web","Apps","Mobile","E-Commerce"] },
+    ];
+    const COMPANIES = [
+      { name:"Prime Engineering Lanka (PVT) LTD", focus:"Engineering & Infrastructure", desc:"Engineering solutions and infrastructure development services." },
+      { name:"Prime Teleservice (PVT) LTD", focus:"Telecommunications", desc:"Telecommunications and telecom infrastructure services." },
+      { name:"Prime IT Solutions (PVT) LTD", focus:"Information Technology", desc:"Comprehensive IT solutions, consulting, and technology services.", highlight:true },
+      { name:"Prime Engineering Automation (PVT) LTD", focus:"Engineering & Automation", desc:"Engineering automation solutions and services." },
+      { name:"Prime Academy (PVT) LTD", focus:"Education & Training", desc:"Professional training and skill development in various fields." },
+      { name:"Prime Holidays (PVT) LTD", focus:"Travel & Hospitality", desc:"Travel and hospitality services for corporate and leisure clients." },
+      { name:"PELa Ceylon Teas (PVT) LTD", focus:"Agriculture & Export", desc:"Premium tea production and export services." },
+    ];
+    const INDUSTRIES = ["Financial Services","Healthcare","Manufacturing","Retail & E-commerce","Education","Government","Telecommunications","Energy & Utilities","Transportation & Logistics"];
+
+    const desktopNav = document.getElementById("desktop-nav");
+    NAV_ITEMS.forEach(n => {
+      const b = document.createElement("button");
+      b.dataset.nav = n.key;
+      b.className = "rounded-full px-4 py-2 text-sm transition text-white/70 hover:bg-white/5 hover:text-white";
+      b.textContent = n.label;
+      desktopNav.appendChild(b);
+    });
+
+    const mobileNav = document.getElementById("mobile-nav");
+    NAV_ITEMS.forEach(n => {
+      const b = document.createElement("button");
+      b.dataset.nav = n.key;
+      b.className = "text-left rounded-xl px-4 py-3 bg-white/5";
+      b.textContent = n.label;
+      mobileNav.appendChild(b);
+    });
+
+    const servicesPreview = document.getElementById("services-preview");
+    SERVICES.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "group rounded-3xl border border-white/10 bg-white/5 p-5 text-left hover:bg-white/10";
+      div.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-white/10">
+            <svg class="w-5 h-5 text-cyan-300"><use href="${s.icon}"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold">${s.title}</h3>
+              <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition"><use href="#chevron-right"/></svg>
+            </div>
+            <p class="mt-1 text-sm text-white/70">${s.blurb}</p>
+            <div class="mt-3 flex flex-wrap gap-2">${s.chips.map(c=>`<span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">${c}</span>`).join("")}</div>
+          </div>
+        </div>`;
+      div.addEventListener("click", () => setPage("services"));
+      servicesPreview.appendChild(div);
+    });
+
+    const servicesFull = document.getElementById("services-full");
+    SERVICES.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "rounded-3xl border border-white/10 bg-white/5 p-6";
+      div.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
+            <svg class="w-6 h-6 text-fuchsia-300"><use href="${s.icon}"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold">${s.title}</h3>
+            <p class="mt-1 text-white/70">${s.body}</p>
+            <div class="mt-3 flex flex-wrap gap-2">${s.chips.map(c=>`<span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">${c}</span>`).join("")}</div>
+          </div>
+        </div>`;
+      servicesFull.appendChild(div);
+    });
+
+    const companiesGrid = document.getElementById("companies-grid");
+    COMPANIES.forEach(c => {
+      const div = document.createElement("div");
+      div.className = `rounded-3xl border p-6 ${c.highlight ? "border-cyan-400/40 bg-gradient-to-br from-cyan-500/10 to-fuchsia-500/10" : "border-white/10 bg-white/5"}`;
+      div.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-white/10">
+            <svg class="w-5 h-5 text-cyan-300"><use href="#building2"/></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold">${c.name}</h3>
+            <div class="mt-1 text-sm text-white/60">Focus Area</div>
+            <div class="text-white/85 font-medium">${c.focus}</div>
+            <p class="mt-2 text-white/70">${c.desc}</p>
+          </div>
+        </div>`;
+      companiesGrid.appendChild(div);
+    });
+
+    const industriesEl = document.getElementById("industries");
+    INDUSTRIES.forEach(i => {
+      const span = document.createElement("span");
+      span.className = "rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80";
+      span.textContent = i;
+      industriesEl.appendChild(span);
+    });
+
+    const yearEl = document.getElementById("year");
+    yearEl.textContent = new Date().getFullYear();
+
+    const pages = {};
+    NAV_ITEMS.forEach(n => pages[n.key] = document.getElementById("page-" + n.key));
+    const currentView = document.getElementById("current-view");
+
+    function setPage(key) {
+      Object.entries(pages).forEach(([k, el]) => {
+        if (!el) return;
+        if (k === key) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+          setTimeout(() => { if (!el.classList.contains("active")) el.style.display="none"; }, 200);
+        }
+        el.style.display = k === key ? "block" : "none";
+      });
+      currentView.textContent = `You’re viewing: ${NAV_ITEMS.find(n=>n.key===key)?.label || ""}.`;
+      document.querySelectorAll("[data-nav]").forEach(btn => {
+        btn.classList.toggle("bg-white/10", btn.dataset.nav === key && btn.closest("#desktop-nav"));
+        btn.classList.toggle("text-white", btn.dataset.nav === key && btn.closest("#desktop-nav"));
+      });
+      if (!document.getElementById("mobile-nav").classList.contains("hidden")) toggleMobile(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll("[data-nav]").forEach(btn => btn.addEventListener("click", () => setPage(btn.dataset.nav)));
+
+    function toggleMobile(forceClose=false) {
+      const nav = document.getElementById("mobile-nav");
+      const icon = document.getElementById("mobile-icon");
+      const open = forceClose ? false : nav.classList.contains("hidden");
+      nav.classList.toggle("hidden", !open);
+      nav.classList.toggle("block", open);
+      icon.innerHTML = `<use href="${open ? '#x' : '#menu'}"/>`;
+    }
+    document.getElementById("mobile-toggle").addEventListener("click", () => toggleMobile());
+
+    document.getElementById("contact-form").addEventListener("submit", e => {
+      e.preventDefault();
+      document.getElementById("form-status").classList.remove("hidden");
+    });
+
+    setPage("home");
+  </script>
+</body>
 </html>
